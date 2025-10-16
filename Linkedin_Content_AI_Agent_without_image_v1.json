@@ -1,0 +1,642 @@
+{
+  "name": "KN Linkedin Content AI Agent without image v1",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a LinkedIn post writer trained to match a crisp, no-fluff, systems-driven, slightly provocative style.\nUse signature phrases like:\n\n    “Hard truth:”\n\n    “The system is broken. Here’s why.”\n\n    “Before you throw AI at it, fix the fundamentals.”\n\n    “Automating chaos just gives you faster chaos.”\n\n    “Not magic. Just simple cause and effect.”\n\n    “Sounds harsh? It’s just math.”\n\n    “Most people get this wrong.”\n    Use short, punchy sentences. Favor logic and practical insights over hype. No validation-seeking.\n\nYou will be given a title, angle, and type. Your task is to create an engaging LinkedIn post based on that input.\n\nYour post must:\n\n    Start with a strong, thought-provoking hook tied to the title.\n\n    Include 3-4 short, direct paragraphs that break down insights, show logic, or challenge flawed systems.\n\n    End with a sharp question that drives serious discussion (not fluff).\n\n    Include 4-6 well-selected hashtags.\n\n    Sprinkle emojis sparingly for emphasis.\n\nStrict formatting rules:\n\n    Use proper newline characters (\\n\\n) between paragraphs.\n\n    Escape all text properly for JSON.\n\n    Avoid double quotes (\"\") and special characters.\n\n    Do not use asterisks.\n\n    Keep total length under 3000 characters, suitable for LinkedIn.\n\nReturn your response as a clean JSON object only, exactly in this format (no markdown or backticks):\n{\"post\": \"your linkedin post content here\"}\n\nNow, create a LinkedIn post using:\nTitle: {{ $json.Title }}\nAngle: {{ $json.Angle }}\nType: {{ $json.Type }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        960,
+        360
+      ],
+      "id": "d506a693-5629-46a2-8b95-4ef80e95e805",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  let raw = item.json.output || '';\n  \n  // Remove triple backticks and markdown markers\n  raw = raw.replace(/```json|```/g, '').trim();\n  \n  // Find and isolate valid JSON portion\n  const start = raw.indexOf('{');\n  const end = raw.lastIndexOf('}') + 1;\n  \n  if (start === -1 || end <= start) {\n    return {\n      json: {\n        post: '⚠️ No valid JSON found in AI output.',\n      },\n    };\n  }\n  \n  const jsonString = raw.slice(start, end);\n  \n  try {\n    // Parse JSON\n    const parsed = JSON.parse(jsonString);\n    \n    if (!parsed.post) {\n      return {\n        json: {\n          post: '⚠️ Post missing from AI output.',\n        },\n      };\n    }\n    \n    // Fix formatting: convert escaped newlines to actual newlines\n    // Handle both \\\\n\\\\n and \\n patterns\n    let formattedPost = parsed.post\n      .replace(/\\\\n\\\\n/g, '\\n\\n')  // Convert \\\\n\\\\n to actual double newlines\n      .replace(/\\\\n/g, '\\n')       // Convert remaining \\\\n to single newlines\n      .trim();\n    \n    return {\n      json: {\n        post: formattedPost,\n      },\n    };\n  } catch (e) {\n    // Enhanced error logging for debugging\n    console.log('Parse error:', e.message);\n    console.log('JSON string:', jsonString);\n    \n    return {\n      json: {\n        post: '⚠️ Error parsing AI output.',\n      },\n    };\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        360
+      ],
+      "id": "950de0f0-861a-4d2b-bb80-33c932df92a6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Posts - execution",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "completed",
+            "ID": "={{ $('Read Ideas from Sheet').item.json.ID }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Angle",
+              "displayName": "Angle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1680,
+        360
+      ],
+      "id": "0cd59e24-1e4e-42b1-829a-118ea2392ea0",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yVJArDScrYlFYIyh",
+          "name": "Arpan's Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        960,
+        600
+      ],
+      "id": "b2edc1d4-cdd9-4041-8cbd-c62895885eb5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OzwBrswt1IES8KgX",
+          "name": "Arpan's Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc74b0c2-aa46-4bcd-91f3-1eb6b0720167",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "pending",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        360
+      ],
+      "id": "b4349e19-e356-4e38-8ffc-815b003f34c6",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        780,
+        360
+      ],
+      "id": "142e677a-8520-49ce-8637-b11778556065",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        360
+      ],
+      "id": "9131f8dc-6db3-451b-85a1-469f9acf5f91",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b3e666f-779a-4b1d-93cf-ab45913978c2",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "pending",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        360
+      ],
+      "id": "0a99eff9-4916-45d7-9ea1-252469e6bb94",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Posts - execution",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        200,
+        360
+      ],
+      "id": "8c15f8c7-a41b-428b-81eb-ebdb625378d5",
+      "name": "Read Ideas from Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yVJArDScrYlFYIyh",
+          "name": "Arpan's Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an AI content strategist helping a systems-thinking founder grow a powerful LinkedIn presence. Your goal is to generate 30 unique content ideas rooted in:\n\n- Artificial Intelligence (concepts, strategy, implications)\n- Mental models (decision-making, clarity, leverage)\n- Systems thinking (feedback loops, optimization, complexity)\n- Thinking frameworks and cognitive tools (first principles, second-order thinking, etc.)\n- Personal leverage, high-performance habits, and productivity\n\nEach content idea should be:\n- Insightful and thought-provoking\n- Practical, not fluffy\n- Designed to spark engagement, debate, or self-reflection\n- Written with a confident, slightly contrarian, “builder’s mind” tone\n\n**Do not focus on tools, platforms, or the user’s work. Stay thematic, strategic, and mindset-driven.**\n\nFormat as a JSON array of 30 ideas. Each idea should contain:\n- `title`: A scroll-stopping headline idea\n- `angle`: The key insight, narrative, or example behind the idea\n- `type`: [Mental Model, Framework, Thought Leadership, Insight, Question, Experiment]\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        160,
+        0
+      ],
+      "id": "401eb55c-d19d-47de-a501-e4a8e2f18b22",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        180
+      ],
+      "id": "29091386-f01d-4400-835d-067b4f2c753c",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IC7bpNow8oxUbK78",
+          "name": "KN DSM Google Gemini(PaLM) Api"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input is a JSON string with one property \"output\" (a stringified JSON array)\nconst output = items[0].json.output;\n\n// Remove code block backticks and language tag\nconst cleaned = output.replace(/```json|```/g, \"\").trim();\n\n// Parse the string into an array of ideas\nconst ideas = JSON.parse(cleaned);\n\n// Return each idea as a separate item\nreturn ideas.map(idea => ({ json: idea }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "9c6467a8-0ec6-46c8-aea3-c8008a9eab02",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "41da427e-1f6d-4152-a9f2-caf5589b6463",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1yjEWsDVvqCjB_c6znhNKATp9L24nS7GhUpPuGDpVVRQ",
+          "mode": "list",
+          "cachedResultName": "DSM LinkedIn Posts AI Agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yjEWsDVvqCjB_c6znhNKATp9L24nS7GhUpPuGDpVVRQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713145354,
+          "mode": "list",
+          "cachedResultName": "Ideas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCKRQxpnfPPxig6vz6DIi49bqHyLtHUNhgoVDOaCI5Q/edit#gid=1713145354"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $json.title }}",
+            "Type": "={{ $json.type }}",
+            "Angle": "={{ $json.angle }}"
+          },
+          "matchingColumns": [
+            "Title"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Angle",
+              "displayName": "Angle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        660,
+        0
+      ],
+      "id": "4973e0c5-c25f-4789-86ad-13575aed0fb2",
+      "name": "Send Ideas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "50DCmt1movthIA5n",
+          "name": "KN DSM Public Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "89MwqtcsIp",
+        "text": "={{ $node[\"Code\"].json.post }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        360
+      ],
+      "id": "eab6b003-2281-4c8d-b0ee-c3134d7511c2",
+      "name": "LinkedIn",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "hdGixhqPTAaFSGgU",
+          "name": "Arpan;s LinkedIn account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-05-26T10:00:28.007+05:30",
+          "Readable date": "May 26th 2025, 10:00:28 am",
+          "Readable time": "10:00:28 am",
+          "Day of week": "Monday",
+          "Year": "2025",
+          "Month": "May",
+          "Day of month": "26",
+          "Hour": "10",
+          "Minute": "00",
+          "Second": "28",
+          "Timezone": "Asia/Kolkata (UTC+05:30)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Ideas from Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Ideas from Sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Send Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ead91594-1b2a-4671-b332-afd0b9c2d881",
+  "meta": {
+    "instanceId": "a39925a189fc4958777cfbc2ee952f96a625e56b8dde120f89d58a7cdacf694a"
+  },
+  "id": "xfNGMhYTHlXogLig",
+  "tags": []
+}
