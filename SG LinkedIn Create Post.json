@@ -1,0 +1,150 @@
+{
+  "name": "SG LinkedIn Create Post",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "8e74f088-a428-463e-9186-64b58add8a91",
+      "name": "When chat message received",
+      "webhookId": "ab3f4263-662b-4f6d-8253-3d5dedd04fd8"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a LinkedIn article writer trained to match a crisp, no-fluff, systems-driven, slightly provocative style.\n\nTASK:\nCreate a LinkedIn article that:\n- Starts with a strong, thought-provoking hook.\n- Has EXACTLY 4 paragraphs. Each paragraph has 3–4 sentences. Separate paragraphs with literal \\n\\n (two backslash+n sequences).\n- Ends with a sharp question to drive serious discussion.\n- Includes 4–6 relevant hashtags on the final line after the question.\n- Matches the title\n\n\nSTYLE RULES:\n- Avoid double quotes inside content; use single quotes if needed. Do not include backticks or markdown.\n- Keep total characters under 3000.\n\nSELF-CHECK BEFORE RESPONDING:\n- post has exactly 3 occurrences of \\n\\n (4 paragraphs).\n- Each paragraph has 3–4 sentences.\n- Last paragraph ends with a question mark.\n- Final line contains 4–6 hashtags.\n- No double quotes inside post or image_prompt.\n- Total length < 3000 chars.\n\nNow generate the article. \nAlways ask for confirmation from me before posting.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "7285c844-7718-496c-b2bc-73c683f44911",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        272,
+        128
+      ],
+      "id": "4feb044f-76a1-4b75-9125-cb8d1051323d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yCtsLETHMKQQBR4G",
+          "name": "SG_GoogleLogin"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        128
+      ],
+      "id": "a7db37cf-4fc7-4269-9e4c-88bf6a3cdb23",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "person": "5BqnCFNpig",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedInTool",
+      "typeVersion": 1,
+      "position": [
+        576,
+        128
+      ],
+      "id": "e97e9cfd-c30b-42a2-ada4-48a66c1dc293",
+      "name": "Create a post in LinkedIn",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "LGGEp9OGUtbV8n0s",
+          "name": "SG LinkedIn account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post in LinkedIn": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d60cdd9a-de92-45f3-9dd9-eade9f5c7481",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "id": "mHtUz8gFXWeuvvUh",
+  "tags": [
+    {
+      "createdAt": "2025-11-01T17:53:32.390Z",
+      "updatedAt": "2025-11-01T17:53:32.390Z",
+      "id": "ng1dgEloOm3KOCuS",
+      "name": "SG"
+    }
+  ]
+}
