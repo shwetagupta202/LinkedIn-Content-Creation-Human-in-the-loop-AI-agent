@@ -1,0 +1,63 @@
+{
+  "name": "My workflow 26",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## System 1 - Content AI Agent\n- Creates the first draft of post",
+        "height": 528,
+        "width": 784
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -800,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "9415a093-af89-4de1-b6ab-c42cb50010cf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## System 2 - If No Changes - then Posts in LinkedIn ",
+        "height": 384,
+        "width": 784
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f05d6344-45d8-49b4-bb0b-66aae7e38ff6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## System 3 - If HAS Changes - Re Writes and posts ",
+        "height": 400,
+        "width": 784
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "86db60d8-97a0-42be-9cd2-328d3e03d935",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ee3ae7bf-eed8-4b23-91bc-e88a7a2beed7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "id": "PLS8ROgHzQEsgiki",
+  "tags": []
+}
